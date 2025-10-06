@@ -1,12 +1,24 @@
 const messagesContainer = document.getElementById('chatbot-messages');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
+const suggestionArea = document.getElementById('suggestion-area');
 
-// --- CƠ SỞ DỮ LIỆU CỦA CHATBOT ---
-// `keywords` là các từ khóa chính trong câu hỏi.
-// `answer` là câu trả lời tương ứng.
+const botAvatarSrc = 'https://bom.so/LjBOof';
+const userAvatarSrc = 'https://bom.so/eYj7KH';
+
+//  DANH SÁCH CÂU HỎI GỢI Ý 
+const suggestionQuestions = [
+    "Học phí",
+    "Các ngành đào tạo",
+    "Phương thức xét tuyển",
+    "Địa chỉ các cơ sở",
+    "Thông tin học bổng",
+    "Liên hệ"
+];
+
+//CƠ SỞ DỮ LIỆU CỦA CHATBOT 
 const qaData = [
-    // --- TUYỂN SINH & NGÀNH HỌC ---
+    // TUYỂN SINH & NGÀNH HỌC
     {
         keywords: ["xét tuyển", "phương thức", "đăng ký", "nộp hồ sơ"],
         answer: "Năm nay, ĐH Duy Tân có các phương thức xét tuyển chính: \n1. Xét tuyển thẳng theo quy định của Bộ GD&ĐT.\n2. Xét kết quả thi Tốt nghiệp THPT.\n3. Xét kết quả học bạ THPT.\n4. Xét tuyển theo kết quả thi Đánh giá Năng lực của ĐH Quốc gia. \nBạn có thể xem chi tiết và nộp hồ sơ trực tuyến tại trang: https://tuyensinh.duytan.edu.vn"
@@ -32,7 +44,7 @@ const qaData = [
         answer: "Trường có nhiều chương trình liên kết quốc tế và chương trình tiên tiến, giúp sinh viên tiếp cận giáo trình chuẩn quốc tế. Các chương trình nổi bật như hợp tác với ĐH Pennsylvania State (PSU), ĐH California State (CSU)... mang lại nhiều cơ hội học tập và nhận bằng cấp giá trị."
     },
 
-    // --- CƠ SỞ VẬT CHẤT & LIÊN HỆ ---
+    //CƠ SỞ VẬT CHẤT & LIÊN HỆ 
     {
         keywords: ["địa chỉ", "cơ sở", "trường ở đâu", "campus"],
         answer: "Đại học Duy Tân có nhiều cơ sở tại trung tâm thành phố Đà Nẵng. Các cơ sở chính bao gồm:\n- 254 Nguyễn Văn Linh, Q. Thanh Khê\n- 137 Nguyễn Văn Linh, Q. Thanh Khê\n- K7/25 Quang Trung, Q. Hải Châu\n- 03 Quang Trung, Q. Hải Châu\n- Cơ sở Hòa Khánh Nam, Q. Liên Chiểu."
@@ -46,7 +58,7 @@ const qaData = [
         answer: "Thư viện của trường có 3 cơ sở lớn tại 254 Nguyễn Văn Linh, 03 Quang Trung và cơ sở Hòa Khánh Nam. Với hàng chục ngàn đầu sách và hệ thống thư viện điện tử, đây là nơi lý tưởng để sinh viên học tập và nghiên cứu."
     },
 
-    // --- DÀNH CHO SINH VIÊN ---
+    // DÀNH CHO SINH VIÊN
     {
         keywords: ["mydtu", "cổng thông tin", "portal", "xem điểm", "lịch học"],
         answer: "MyDTU là cổng thông tin dành riêng cho sinh viên, giảng viên và nhân viên trường. Bạn có thể truy cập https://mydtu.duytan.edu.vn để xem điểm, lịch học, lịch thi, thông tin học phí và các thông báo quan trọng khác."
@@ -63,12 +75,14 @@ const qaData = [
         keywords: ["lịch nghỉ", "kế hoạch năm học", "lịch học vụ"],
         answer: "Kế hoạch đào tạo và lịch nghỉ Lễ, Tết của từng năm học được công bố trên trang web của Phòng Đào tạo và cổng thông tin MyDTU. Sinh viên cần theo dõi thường xuyên để cập nhật thông tin chính xác."
     },
-    {
-        keywords: ["giấy tờ", "thủ tục", "xác nhận sinh viên",],
-        answer: "Để làm các thủ tục hành chính như xin xác nhận sinh viên, bạn có thể đến trực tiếp Phòng Công tác Sinh viên tại Phòng 303 cơ sở 254 Nguyễn Văn Linh hoặc liên hệ qua email khoamarketing@duytan.edu.vn để được hướng dẫn chi tiết."
-    },
 
-    // --- CÁC CÂU HỎI CHUNG & GIAO TIẾP ---
+    //HỖ TRỢ NGƯỜI DÙNG MỚI 
+    {
+        keywords: ["help", "trợ giúp", "giúp đỡ", "bắt đầu", "gợi ý"],
+        answer: "Chào bạn! Để bắt đầu, bạn có thể hỏi tôi về các chủ đề phổ biến sau đây:\n\n- 'Học phí của trường'\n- 'Các ngành đào tạo'\n- 'Phương thức xét tuyển'\n- 'Địa chỉ các cơ sở'\n- 'Thông tin học bổng'\n- 'Cách xem lịch học'\n\nChỉ cần gõ từ khóa liên quan đến vấn đề bạn quan tâm, tôi sẽ cố gắng giải đáp!"
+    },
+    
+    //CÁC CÂU HỎI CHUNG & GIAO TIẾP
     {
         keywords: ["giới thiệu", "lịch sử"],
         answer: "Đại học Duy Tân được thành lập vào ngày 11/11/1994, là trường Đại học Tư thục đầu tiên và lớn nhất miền Trung Việt Nam. Trường luôn nỗ lực không ngừng trong việc nâng cao chất lượng đào tạo và nghiên cứu khoa học."
@@ -90,56 +104,83 @@ const qaData = [
 // Hàm tìm câu trả lời dựa trên từ khóa
 function findAnswer(question) {
     const lowerCaseQuestion = question.toLowerCase();
-    
-    // Tìm câu trả lời khớp với từ khóa
-    const foundQA = qaData.find(qa => 
-        qa.keywords.some(keyword => lowerCaseQuestion.includes(keyword))
-    );
-
+    const foundQA = qaData.find(qa => qa.keywords.some(keyword => lowerCaseQuestion.includes(keyword)));
     if (foundQA) {
         return foundQA.answer;
     }
-
-    // Câu trả lời mặc định nếu không tìm thấy
-    return "Xin lỗi, tôi chưa hiểu câu hỏi của bạn. Bạn có thể hỏi cách khác được không?";
+    return "Xin lỗi, tôi chưa hiểu câu hỏi của bạn. Bạn có thể thử các câu hỏi gợi ý hoặc hỏi theo cách khác nhé.";
 }
 
-// Hàm hiển thị tin nhắn trong khung chat
+//HÀM DISPLAYMESSAGE ĐÃ ĐƯỢC CẬP NHẬT
 function displayMessage(message, sender) {
+    // 1. Tạo container chính cho tin nhắn
+    const messageContainer = document.createElement('div');
+    messageContainer.classList.add('message-container', `${sender}-message-container`);
+
+    // 2. Tạo ảnh avatar
+    const avatar = document.createElement('img');
+    avatar.src = sender === 'user' ? userAvatarSrc : botAvatarSrc;
+    avatar.classList.add('avatar');
+
+    // 3. Tạo bong bóng chat
     const messageElement = document.createElement('div');
     messageElement.classList.add('message', `${sender}-message`);
-    messageElement.innerText = message;
-    messagesContainer.appendChild(messageElement);
-    // Tự động cuộn xuống tin nhắn mới nhất
+    messageElement.innerHTML = message.replace(/\n/g, '<br>');
+
+    // 4. Gắn avatar và bong bóng chat vào container
+    messageContainer.appendChild(avatar);
+    messageContainer.appendChild(messageElement);
+
+    // 5. Gắn container vào khung chat
+    messagesContainer.appendChild(messageContainer);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-// Hàm xử lý khi người dùng gửi tin nhắn
-function handleSendMessage() {
-    const userQuestion = userInput.value.trim();
-    if (userQuestion === "") {
-        return; 
-    }
 
-    // Hiển thị câu hỏi của người dùng
-    displayMessage(userQuestion, 'user');
-
-    // Tìm và hiển thị câu trả lời của bot
-    const botAnswer = findAnswer(userQuestion);
-    
-    // Giả lập bot đang "suy nghĩ"
+function sendQuestion(question) {
+    displayMessage(question, 'user');
+    const botAnswer = findAnswer(question);
     setTimeout(() => {
         displayMessage(botAnswer, 'bot');
-    }, 500); 
-
-    // Xóa nội dung trong ô nhập
-    userInput.value = "";
+    }, 500);
+    suggestionArea.style.display = 'none';
 }
 
-// Gán sự kiện cho nút Gửi và phím Enter
+
+function handleSendMessage() {
+    const userQuestion = userInput.value.trim();
+    if (userQuestion === "") return;
+    sendQuestion(userQuestion);
+    userInput.value = "";
+    userInput.focus();
+}
+
+
 sendBtn.addEventListener('click', handleSendMessage);
-userInput.addEventListener('keypress', function(event) {
+userInput.addEventListener('keypress', (event) => {
     if (event.key === 'Enter') {
         handleSendMessage();
     }
+});
+
+
+function createSuggestionButtons() {
+    suggestionArea.innerHTML = '';
+    suggestionQuestions.forEach(question => {
+        const button = document.createElement('button');
+        button.classList.add('suggestion-btn');
+        button.innerText = question;
+        button.onclick = () => {
+            sendQuestion(question);
+};
+        suggestionArea.appendChild(button);
+    });
+}
+
+
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        displayMessage("Chào mừng bạn đến với Chatbot Duy Tân! Vui lòng chọn một chủ đề bên dưới hoặc nhập câu hỏi của bạn.", 'bot');
+        createSuggestionButtons();
+    }, 1000);
 });
