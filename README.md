@@ -49,5 +49,4 @@ Dự án này được chia sẻ với mục đích học hỏi và phát triể
 
 ## ✍️ Nguồn
 
--   **Phát triển ban đầu bởi:** [Hoan IT](https://hoanit.id.vn/)
--   **Hỗ trợ và phát triển bởi:** Google Gemini
+-   **Phát triển bởi:** [Hoan IT](https://hoanit.id.vn/)
